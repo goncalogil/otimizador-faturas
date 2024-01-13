@@ -1,13 +1,6 @@
-let firstTime = false
-
-function handleRequest() {
-  if (!firstTime) {
-    console.log('Loaded!')
-    firstTime = true
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.action === 'log') {
+    // Forward the message to the service worker
+    chrome.runtime.sendMessage({ action: 'log', message: message.message });
   }
-}
-
-chrome.webRequest.onCompleted.addListener(
-  handleRequest,
-  { urls: ['https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosAdquirente.action?*'] }
-);
+});

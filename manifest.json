@@ -4,13 +4,14 @@
   "description": "Script para optimizar a classificação das facturas",
   "version": "1.0",
   "background": {
-    "service_worker": "src/background.js",
+    "service_worker": "src/serviceWorker.js",
     "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html"
   },
   "host_permissions": [
     "*://faturas.portaldasfinancas.gov.pt/*"
   ],
-  "permissions": [
-    "webRequest"
-  ]
+  "permissions": []
 }
