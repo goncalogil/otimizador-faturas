@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Optimizador Facturas",
+  "description": "Script para optimizar a classificação das facturas",
+  "version": "1.0",
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "host_permissions": [
+    "*://faturas.portaldasfinancas.gov.pt/*"
+  ],
+  "permissions": [
+    "webRequest"
+  ]
+}
