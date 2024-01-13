@@ -13,5 +13,7 @@
   "host_permissions": [
     "*://faturas.portaldasfinancas.gov.pt/*"
   ],
-  "permissions": []
+  "permissions": [
+    "scripting"
+  ]
 }

@@ -1,10 +1,11 @@
-async function logger(message: string) {
-  await chrome.runtime.sendMessage({ action: 'log', message });
-}
 
-// Function to be called when the button is clicked
 async function runScript() {
-  await logger("Hello!")
+  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id!, allFrames: true },
+      files: ['src/domain/index.js'],
+    });
+  });
 }
 
 // Attach click event to the button
