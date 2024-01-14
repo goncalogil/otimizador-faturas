@@ -118,3 +118,40 @@ const encodeClassificationBody = (fatura: Fatura, classification: FaturaClassifi
 
   return body.toString()
 }
+
+
+
+export const getFaturasByClassification = async (fromDate: Date, toDate: Date, classification: FaturaClassification): Promise<Fatura[]> => {
+  const request = new URL('https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosIRSAdquirente.action')
+  request.searchParams.append("dataInicioFilter", fromDate.toISOString().slice(0, 10))
+  request.searchParams.append("dataFimFilter", toDate.toISOString().slice(0, 10))
+  request.searchParams.append('ambitoAquisicaoFilter', classification)
+
+  const response: FetchFaturasResponse = await fetch(request, {
+    headers: {
+      "accept": "application/json, text/javascript, */*; q=0.01",
+      "accept-language": "en-US,en;q=0.9",
+      "sec-ch-ua": "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\"",
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": "\"Linux\"",
+      "sec-fetch-dest": "empty",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-site": "same-origin",
+      "x-requested-with": "XMLHttpRequest"
+    },
+    referrerPolicy: "strict-origin-when-cross-origin",
+    method: "GET",
+    mode: "cors",
+    credentials: "include"
+  }).then((response) => response.json());
+
+  return response.linhas.map((it) => ({
+    idDocumento: it.idDocumento,
+    nifEmitente: it.nifEmitente,
+    nomeEmitente: it.nomeEmitente,
+    actividadeEmitente: it.actividadeEmitente,
+    dataEmissaoDocumento: it.dataEmissaoDocumento,
+    valorTotalBeneficioProv: it.valorTotalBeneficioProv,
+    hashDocumento: it.hashDocumento,
+  }))
+}

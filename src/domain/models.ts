@@ -4,6 +4,7 @@ export type Fatura = {
   nomeEmitente: string;
   actividadeEmitente?: string;
   dataEmissaoDocumento: string;
+  valorTotalBeneficioProv?: number;
   hashDocumento?: string;
 }
 
