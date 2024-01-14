@@ -1,9 +1,9 @@
-import { getFaturas, classifyFatura } from "./gateways/portalFinancas"
-import { FaturaClassification } from "./domain/models"
+import { optimizeFaturas } from "./domain/faturasService"
 
 async function main() {
-  const faturas = await getFaturas()
-  await classifyFatura(faturas[0], FaturaClassification.PASSES).then((it) => console.log(it))
+  const fromDate = new Date('2023-12-01')
+  const toDate = new Date('2023-12-31')
+  await optimizeFaturas(fromDate, toDate)
 }
 
 main()
