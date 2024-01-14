@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "license": "AGPL-version-3.0",
   "private": false,
   "engines": {
@@ -22,12 +21,15 @@
     "dev": "",
     "test": "",
     "clean": "rm -rf dist",
-    "compile": "npx tsc",
+    "compile": "webpack && tsc",
     "copy-assets": "rsync -av --exclude 'tsconfig.json' --exclude 'src' --exclude 'dist' ./ dist/",
     "build": "npm run clean && npm run compile && npm run copy-assets"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.256",
-    "typescript": "^5.3.3"
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   }
 }
