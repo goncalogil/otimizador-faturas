@@ -51,16 +51,15 @@ type FetchFaturasResponse = {
   numElementos: number,
   totalElementos: number
 }
-export const getFaturas = async (): Promise<Fatura[]> => {
+export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
   const request = new URL('https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosAdquirente.action')
-  request.searchParams.append("dataInicioFilter", "2024-01-01")
-  request.searchParams.append("dataFimFilter", "2024-01-11")
+  request.searchParams.append("dataInicioFilter", fromDate.toISOString().slice(0, 10))
+  request.searchParams.append("dataFimFilter", toDate.toISOString().slice(0, 10))
 
   const requestOptions: RequestInit = {}
 
   const response: FetchFaturasResponse = await fetch(request, requestOptions)
     .then((response) => response.json())
-
 
   return response.linhas.map((it) => (
     {
@@ -89,14 +88,16 @@ export const classifyFatura = async (fatura: Fatura, classification: FaturaClass
   const parser = new DOMParser();
   const doc = parser.parseFromString(result, 'text/html');
   const errors = Array.from(doc.querySelectorAll('.alert-error'))
-
-  console.log(result);
+  const succes = Array.from(doc.querySelectorAll('.alert-success'))
 
   if (errors.some((it) => it.textContent?.includes('pertencente ao setor indicado'))) {
-    throw new InvalidClassificationError("The specified classification is not valid for this invoice")
+    return false;
+  }
+  if (succes.some((it) => it.textContent?.includes('Informação guardada com sucesso.'))) {
+    return true
   }
 
-  return;
+  throw new Error(`The classification requets <${classification}> to invoice ${fatura.idDocumento} returned an invalid result`)
 }
 
 const encodeClassificationBody = (fatura: Fatura, classification: FaturaClassification): string => {
