@@ -1,7 +1,7 @@
-import { classifyFatura, getFaturas } from "../gateways/portalFinancas";
+import { classifyFatura, getFaturas, getFaturasByClassification } from "../gateways/portalFinancas";
 import { Fatura, FaturaClassification } from "./models"
 
-const classificationPriority = [
+const classificationPriority: FaturaClassification[] = [
   FaturaClassification.EDUCACAO,
   FaturaClassification.HABITACAO,
   FaturaClassification.LARES,
@@ -45,5 +45,26 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
     const highestClassification = await getHighestClassification(fatura, classificationPriority)
     register[fatura.nifEmitente] = highestClassification
     console.log(`Stored ${highestClassification} classification to NIF: ${fatura.nifEmitente}`)
+  }
+
+  await adjustFaturasWithZeroBenefit(fromDate, toDate)
+}
+
+const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
+  const classificationPriorityAux: FaturaClassification[] = Array.from(classificationPriority);
+
+  while (classificationPriorityAux.length > 1) {
+    const classification = classificationPriorityAux.shift();
+    if (!classification) {
+      throw new Error("No classifications available")
+    }
+
+    const faturas = await getFaturasByClassification(fromDate, toDate, classification)
+    const faturasToAdjust = faturas.filter((it) => it.valorTotalBeneficioProv === 0)
+
+    for (const fatura of faturasToAdjust) {
+      const newHighestClassification = await getHighestClassification(fatura, classificationPriorityAux)
+      console.log(`Adjusted fatura ${fatura.idDocumento} to ${newHighestClassification}`)
+    }
   }
 }
