@@ -4,4 +4,11 @@ export type Fatura = {
   nomeEmitente: string;
   actividadeEmitente?: string;
   dataEmissaoDocumento: string;
+  hashDocumento?: string;
+}
+
+
+export enum FaturaClassification {
+  PASSES = "C10",
+  OUTROS = "C99"
 }
