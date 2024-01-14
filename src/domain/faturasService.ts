@@ -18,9 +18,9 @@ const classificationPriority = [
 
 const register: Record<number, FaturaClassification> = {}
 
-export const getHighestClassification = async (fatura: Fatura): Promise<FaturaClassification> => {
+export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification> => {
 
-  for (const classification of classificationPriority) {
+  for (const classification of order) {
     const isClassificationValid = await classifyFatura(fatura, classification)
     if (isClassificationValid) {
       return classification
@@ -42,7 +42,7 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
       continue;
     }
 
-    const highestClassification = await getHighestClassification(fatura)
+    const highestClassification = await getHighestClassification(fatura, classificationPriority)
     register[fatura.nifEmitente] = highestClassification
     console.log(`Stored ${highestClassification} classification to NIF: ${fatura.nifEmitente}`)
   }
