@@ -17,6 +17,7 @@ const classificationPriority: FaturaClassification[] = [
 ];
 
 const register: Record<number, FaturaClassification> = {}
+const nifIgnoreList: number[] = []
 
 export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification> => {
 
@@ -34,6 +35,10 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
   const faturas = await getFaturas(fromDate, toDate)
 
   for (const fatura of faturas) {
+    if (nifIgnoreList.includes(fatura.nifEmitente)) {
+      console.log(`Skipping ${fatura.idDocumento} with NIF ${fatura.nifEmitente}`)
+      continue;
+    }
     const storedClassifcation = register[fatura.nifEmitente]
 
     if (storedClassifcation) {

@@ -1,5 +1,4 @@
 import { Fatura, FaturaClassification } from "../domain/models.js"
-import InvalidClassificationError from "../domain/exceptions/InvalidClassificationError"
 
 type FetchFactura = {
   idDocumento: number,
