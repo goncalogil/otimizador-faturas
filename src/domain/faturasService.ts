@@ -1,4 +1,4 @@
-import { classifyFatura, getFaturas, getFaturasByClassification } from "../gateways/portalFinancas";
+import * as portalFinancasGateway from "../gateways/portalFinancas";
 import { Fatura, FaturaClassification } from "./models"
 
 const classificationPriority: FaturaClassification[] = [
@@ -22,7 +22,7 @@ const nifIgnoreList: number[] = []
 export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification> => {
 
   for (const classification of order) {
-    const isClassificationValid = await classifyFatura(fatura, classification)
+    const isClassificationValid = await portalFinancasGateway.classifyFatura(fatura, classification)
     if (isClassificationValid) {
       return classification
     }
@@ -32,7 +32,7 @@ export const getHighestClassification = async (fatura: Fatura, order: FaturaClas
 
 
 export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
-  const faturas = await getFaturas(fromDate, toDate)
+  const faturas = await portalFinancasGateway.getFaturas(fromDate, toDate)
 
   for (const fatura of faturas) {
     if (nifIgnoreList.includes(fatura.nifEmitente)) {
@@ -42,7 +42,7 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
     const storedClassifcation = register[fatura.nifEmitente]
 
     if (storedClassifcation) {
-      await classifyFatura(fatura, storedClassifcation)
+      await portalFinancasGateway.classifyFatura(fatura, storedClassifcation)
       console.log(`Classifying fatura from ${fatura.nifEmitente} as ${storedClassifcation}`)
       continue;
     }
@@ -64,7 +64,7 @@ const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
       throw new Error("No classifications available")
     }
 
-    const faturas = await getFaturasByClassification(fromDate, toDate, classification)
+    const faturas = await portalFinancasGateway.getFaturasByClassification(fromDate, toDate, classification)
     const faturasToAdjust = faturas.filter((it) => it.valorTotalBeneficioProv === 0)
 
     for (const fatura of faturasToAdjust) {
@@ -72,4 +72,8 @@ const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
       console.log(`Adjusted fatura ${fatura.idDocumento} to ${newHighestClassification}`)
     }
   }
+}
+
+export const backupState = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
+  return portalFinancasGateway.getFaturas(fromDate, toDate)
 }
