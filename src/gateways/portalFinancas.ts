@@ -65,7 +65,7 @@ export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]
       idDocumento: it.idDocumento,
       nifEmitente: it.nifEmitente,
       nomeEmitente: it.nomeEmitente,
-      actividadeEmitente: it.actividadeEmitente,
+      actividadeEmitente: it.actividadeEmitente as FaturaClassification,
       dataEmissaoDocumento: it.dataEmissaoDocumento,
       hashDocumento: it.hashDocumento
     }
@@ -148,7 +148,7 @@ export const getFaturasByClassification = async (fromDate: Date, toDate: Date, c
     idDocumento: it.idDocumento,
     nifEmitente: it.nifEmitente,
     nomeEmitente: it.nomeEmitente,
-    actividadeEmitente: it.actividadeEmitente,
+    actividadeEmitente: it.actividadeEmitente as FaturaClassification,
     dataEmissaoDocumento: it.dataEmissaoDocumento,
     valorTotalBeneficioProv: it.valorTotalBeneficioProv,
     hashDocumento: it.hashDocumento,

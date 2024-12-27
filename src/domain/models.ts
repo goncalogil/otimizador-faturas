@@ -2,7 +2,7 @@ export type Fatura = {
   idDocumento: number;
   nifEmitente: number;
   nomeEmitente: string;
-  actividadeEmitente?: string;
+  actividadeEmitente?: FaturaClassification;
   dataEmissaoDocumento: string;
   valorTotalBeneficioProv?: number;
   hashDocumento?: string;

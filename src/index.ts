@@ -1,4 +1,5 @@
-import { backupState, optimizeFaturas } from "./domain/faturasService"
+import { backupState, optimizeFaturas, restoreState } from "./domain/faturasService"
+import { Fatura } from "./domain/models"
 
 const fromDate = new Date('2024-01-01')
 const toDate = new Date('2024-12-31')
@@ -27,5 +28,23 @@ async function backup(): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+async function restore(base64File: string) {
+  const decodedString = atob(base64File.split(',')[1]);
+
+  let faturas: Fatura[]
+  try {
+    faturas = JSON.parse(decodedString) as Fatura[];
+  } catch (error) {
+    console.error("Error parsing JSON:", error);
+    throw new Error("Invalid JSON format");
+  }
+
+  if (!faturas) {
+    console.error("Nenhum fatura encontrada")
+  }
+  await restoreState(faturas)
+}
+
 (window as any).optimizer = optimizer;
 (window as any).backup = backup;
+(window as any).restore = restore;

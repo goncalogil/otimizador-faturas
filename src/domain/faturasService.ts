@@ -77,3 +77,17 @@ const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
 export const backupState = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
   return portalFinancasGateway.getFaturas(fromDate, toDate)
 }
+
+export const restoreState = async (faturas: Fatura[]) : Promise<void> => {
+  for(const f of faturas) {
+    if(!f.actividadeEmitente){
+      console.log(`Fatura ${f.idDocumento} without classification. Skipping`)
+      continue;
+    }
+    console.log(`Classifying document ${f.idDocumento} to ${f.actividadeEmitente}`)
+    const succcess = await portalFinancasGateway.classifyFatura(f, f.actividadeEmitente)
+    if(!succcess) {
+      console.log(`Error while classifying document ${f.idDocumento}`)
+    }
+  }
+}
