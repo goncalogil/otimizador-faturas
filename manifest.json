@@ -7,6 +7,12 @@
     "service_worker": "serviceWorker.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["*://faturas.portaldasfinancas.gov.pt/*"],
+      "js": ["index.js"]
+    }
+  ],
   "action": {
     "default_popup": "popup.html"
   },
