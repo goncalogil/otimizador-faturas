@@ -20,14 +20,16 @@
   "scripts": {
     "dev": "",
     "test": "",
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "compile": "node build.js",
-    "copy-assets": "rsync -av --exclude 'tsconfig.json' --exclude 'src' --exclude 'dist' ./ dist/",
+    "copy-assets": "cpx '!(tsconfig).{json,html,css,js}' dist",
     "build": "npm run clean && npm run compile && npm run copy-assets"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.256",
+    "cpx": "^1.5.0",
     "esbuild": "^0.24.2",
+    "rimraf": "^6.0.1",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3"
   }
