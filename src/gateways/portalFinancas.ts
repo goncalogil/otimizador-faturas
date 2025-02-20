@@ -1,4 +1,5 @@
 import { Fatura, FaturaClassification } from "../domain/models.js"
+import { FaturaClassificationResult } from "./models.js"
 
 type FetchFactura = {
   idDocumento: number,
@@ -72,7 +73,7 @@ export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]
   ))
 }
 
-export const classifyFatura = async (fatura: Fatura, classification: FaturaClassification) => {
+export const classifyFatura = async (fatura: Fatura, classification: FaturaClassification) : Promise<FaturaClassificationResult> => {
   const result = await fetch("https://faturas.portaldasfinancas.gov.pt/resolverPendenciaAdquirente.action", {
     headers: {
       "content-type": "application/x-www-form-urlencoded",
@@ -90,13 +91,18 @@ export const classifyFatura = async (fatura: Fatura, classification: FaturaClass
   const succes = Array.from(doc.querySelectorAll('.alert-success'))
 
   if (errors.some((it) => it.textContent?.includes('pertencente ao setor indicado'))) {
-    return false;
+    return FaturaClassificationResult.INVALID;
   }
+  
+  if(errors.some((it) => it.textContent?.includes('O documento não pode ser classificado por estar anulado.'))) {
+    return FaturaClassificationResult.CANCELLED
+  }
+  
   if (succes.some((it) => it.textContent?.includes('Informação guardada com sucesso.'))) {
-    return true
+    return FaturaClassificationResult.VALID
   }
 
-  throw new Error(`The classification requets <${classification}> to invoice ${fatura.idDocumento} returned an invalid result`)
+  return FaturaClassificationResult.UNKNOWN
 }
 
 const encodeClassificationBody = (fatura: Fatura, classification: FaturaClassification): string => {

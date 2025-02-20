@@ -1,3 +1,4 @@
+import { FaturaClassificationResult } from "../gateways/models";
 import * as portalFinancasGateway from "../gateways/portalFinancas";
 import { Fatura, FaturaClassification } from "./models"
 
@@ -19,15 +20,20 @@ const classificationPriority: FaturaClassification[] = [
 const register: Record<number, FaturaClassification> = {}
 const nifIgnoreList: number[] = []
 
-export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification> => {
+export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification | null> => {
 
   for (const classification of order) {
-    const isClassificationValid = await portalFinancasGateway.classifyFatura(fatura, classification)
-    if (isClassificationValid) {
+    const classificationResult = await portalFinancasGateway.classifyFatura(fatura, classification)
+    if (classificationResult === FaturaClassificationResult.VALID) {
       return classification
     }
+    if (classificationResult === FaturaClassificationResult.CANCELLED) {
+      console.warn(`Fatura ${fatura.idDocumento} was cancelled`)
+      return null
+    }
   }
-  throw new Error(`No classification was valid for ${fatura.idDocumento}`)
+  console.warn(`No valid classification found for fatura ${fatura.idDocumento}`)
+  return null
 }
 
 
@@ -35,6 +41,7 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
   const faturas = await portalFinancasGateway.getFaturas(fromDate, toDate)
 
   for (const fatura of faturas) {
+    console.debug(`Handling fatura ${fatura.idDocumento} - NIF: ${fatura.nifEmitente} - ${fatura.nomeEmitente}`)
     if (nifIgnoreList.includes(fatura.nifEmitente)) {
       console.log(`Skipping ${fatura.idDocumento} with NIF ${fatura.nifEmitente}`)
       continue;
@@ -42,20 +49,24 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
     const storedClassifcation = register[fatura.nifEmitente]
 
     if (storedClassifcation) {
-      await portalFinancasGateway.classifyFatura(fatura, storedClassifcation)
       console.log(`Classifying fatura from ${fatura.nifEmitente} as ${storedClassifcation}`)
+      await portalFinancasGateway.classifyFatura(fatura, storedClassifcation)
       continue;
     }
 
     const highestClassification = await getHighestClassification(fatura, classificationPriority)
-    register[fatura.nifEmitente] = highestClassification
-    console.log(`Stored ${highestClassification} classification to NIF: ${fatura.nifEmitente}`)
+    if(highestClassification) {
+      register[fatura.nifEmitente] = highestClassification
+      console.log(`Stored ${highestClassification} classification to NIF: ${fatura.nifEmitente}`)
+    }
   }
 
   await adjustFaturasWithZeroBenefit(fromDate, toDate)
+  console.info("Optimization finished")  
 }
 
 const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
+  console.log("Adjusting faturas with zero benefit")  
   const classificationPriorityAux: FaturaClassification[] = Array.from(classificationPriority);
 
   while (classificationPriorityAux.length > 1) {
