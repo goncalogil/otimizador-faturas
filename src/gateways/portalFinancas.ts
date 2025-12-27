@@ -51,26 +51,75 @@ type FetchFaturasResponse = {
   numElementos: number,
   totalElementos: number
 }
-export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
+
+const yearlyPeriods = (fromDate: Date, toDate: Date): { start: Date; end: Date }[] => {
+  if (fromDate > toDate) return [];
+
+  const fromYear = fromDate.getFullYear()
+  const toYear = toDate.getFullYear()
+
+  const periods: { start: Date; end: Date }[] = []
+
+  for (let year = fromYear; year <= toYear; year++) {
+    const periodStart = year === fromYear
+      ? fromDate
+      : new Date(year, 0, 1) // Jan 1
+
+    const periodEnd = year === toYear
+      ? toDate
+      : new Date(year, 11, 31) // Dec 31
+
+    periods.push({ start: periodStart, end: periodEnd })
+  }
+
+  return periods
+}
+
+export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
+  const allFaturas: FetchFactura[] = []
+
+  for (const yearPeriod of yearlyPeriods(fromDate, toDate)) {
+    let { start, end } = yearPeriod
+    let shouldRequestNextPage = false
+
+    do {
+      const response = await getFaturas(start, end)
+      allFaturas.push(...response.linhas)
+      shouldRequestNextPage = response.numElementos < response.totalElementos
+
+      if (shouldRequestNextPage) {
+        // The API is returning faturas in descending order by date
+        // So we need to move the end date back to the earliest invoice date
+        const lastIndex = response.linhas.length - 1
+        const minDate = response.linhas[lastIndex].dataEmissaoDocumento
+        end = new Date(minDate)
+      }
+    } while (shouldRequestNextPage)
+  }
+
+    const uniqueFaturas = allFaturas.reduce((acc, it) => {
+        // Remove duplicates and map
+        acc.set(it.idDocumento, {
+            idDocumento: it.idDocumento,
+            nifEmitente: it.nifEmitente,
+            nomeEmitente: it.nomeEmitente,
+            actividadeEmitente: it.actividadeEmitente as FaturaClassification,
+            dataEmissaoDocumento: it.dataEmissaoDocumento,
+            hashDocumento: it.hashDocumento
+        })
+
+        return acc
+    }, new Map<number, Fatura>())
+
+    return [...uniqueFaturas.values()]
+}
+
+export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFaturasResponse> => {
   const request = new URL('https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosAdquirente.action')
   request.searchParams.append("dataInicioFilter", fromDate.toISOString().slice(0, 10))
   request.searchParams.append("dataFimFilter", toDate.toISOString().slice(0, 10))
 
-  const requestOptions: RequestInit = {}
-
-  const response: FetchFaturasResponse = await fetch(request, requestOptions)
-    .then((response) => response.json())
-
-  return response.linhas.map((it) => (
-    {
-      idDocumento: it.idDocumento,
-      nifEmitente: it.nifEmitente,
-      nomeEmitente: it.nomeEmitente,
-      actividadeEmitente: it.actividadeEmitente as FaturaClassification,
-      dataEmissaoDocumento: it.dataEmissaoDocumento,
-      hashDocumento: it.hashDocumento
-    }
-  ))
+  return fetch(request).then((response) => response.json())
 }
 
 export const classifyFatura = async (fatura: Fatura, classification: FaturaClassification) : Promise<FaturaClassificationResult> => {

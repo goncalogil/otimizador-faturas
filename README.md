@@ -3,7 +3,7 @@
 1. Install the required dependencies running:
 
 ```bash
-npm run install
+npm install
 ```
 
 2. Build the project with the following command:
