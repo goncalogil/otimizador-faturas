@@ -97,21 +97,21 @@ export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatur
     } while (shouldRequestNextPage)
   }
 
-    const uniqueFaturas = allFaturas.reduce((acc, it) => {
-        // Remove duplicates and map
-        acc.set(it.idDocumento, {
-            idDocumento: it.idDocumento,
-            nifEmitente: it.nifEmitente,
-            nomeEmitente: it.nomeEmitente,
-            actividadeEmitente: it.actividadeEmitente as FaturaClassification,
-            dataEmissaoDocumento: it.dataEmissaoDocumento,
-            hashDocumento: it.hashDocumento
-        })
+  const uniqueFaturas = allFaturas.reduce((acc, it) => {
+    // Remove duplicates and map
+    acc.set(it.idDocumento, {
+      idDocumento: it.idDocumento,
+      nifEmitente: it.nifEmitente,
+      nomeEmitente: it.nomeEmitente,
+      actividadeEmitente: it.actividadeEmitente as FaturaClassification,
+      dataEmissaoDocumento: it.dataEmissaoDocumento,
+      hashDocumento: it.hashDocumento
+    })
 
-        return acc
-    }, new Map<number, Fatura>())
+    return acc
+  }, new Map<number, Fatura>())
 
-    return [...uniqueFaturas.values()]
+  return [...uniqueFaturas.values()]
 }
 
 export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFaturasResponse> => {
