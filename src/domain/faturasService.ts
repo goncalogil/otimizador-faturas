@@ -1,26 +1,26 @@
 import { FaturaClassificationResult } from "../gateways/models";
 import * as portalFinancasGateway from "../gateways/portalFinancas";
-import { Fatura, FaturaClassification } from "./models"
+import { Fatura, FaturaAquisicaoClassification } from "./models"
 
-const classificationPriority: FaturaClassification[] = [
-  FaturaClassification.EDUCACAO,
-  FaturaClassification.HABITACAO,
-  FaturaClassification.LARES,
-  FaturaClassification.SAUDE,
-  FaturaClassification.RESTAURACAO_ALOJAMENTO,
-  FaturaClassification.PASSES,
-  FaturaClassification.CABELEIREIROS,
-  FaturaClassification.REPARACAO_AUTOMOVEIS,
-  FaturaClassification.REPARACAO_MOTOCICLOS,
-  FaturaClassification.VETERINARIOS,
-  FaturaClassification.GINASIOS,
-  FaturaClassification.OUTROS,
+const classificationPriority: FaturaAquisicaoClassification[] = [
+  FaturaAquisicaoClassification.EDUCACAO,
+  FaturaAquisicaoClassification.HABITACAO,
+  FaturaAquisicaoClassification.LARES,
+  FaturaAquisicaoClassification.SAUDE,
+  FaturaAquisicaoClassification.RESTAURACAO_ALOJAMENTO,
+  FaturaAquisicaoClassification.PASSES,
+  FaturaAquisicaoClassification.CABELEIREIROS,
+  FaturaAquisicaoClassification.REPARACAO_AUTOMOVEIS,
+  FaturaAquisicaoClassification.REPARACAO_MOTOCICLOS,
+  FaturaAquisicaoClassification.VETERINARIOS,
+  FaturaAquisicaoClassification.GINASIOS,
+  FaturaAquisicaoClassification.OUTROS,
 ];
 
-const register: Record<number, FaturaClassification> = {}
+const register: Record<number, FaturaAquisicaoClassification> = {}
 const nifIgnoreList: number[] = []
 
-export const getHighestClassification = async (fatura: Fatura, order: FaturaClassification[]): Promise<FaturaClassification | null> => {
+export const getHighestClassification = async (fatura: Fatura, order: FaturaAquisicaoClassification[]): Promise<FaturaAquisicaoClassification | null> => {
 
   for (const classification of order) {
     const classificationResult = await portalFinancasGateway.classifyFatura(fatura, classification)
@@ -67,7 +67,7 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
 
 const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
   console.log("Adjusting faturas with zero benefit")  
-  const classificationPriorityAux: FaturaClassification[] = Array.from(classificationPriority);
+  const classificationPriorityAux: FaturaAquisicaoClassification[] = Array.from(classificationPriority);
 
   while (classificationPriorityAux.length > 1) {
     const classification = classificationPriorityAux.shift();

@@ -2,14 +2,13 @@ export type Fatura = {
   idDocumento: number;
   nifEmitente: number;
   nomeEmitente: string;
-  actividadeEmitente?: FaturaClassification;
+  actividadeEmitente?: FaturaAquisicaoClassification;
   dataEmissaoDocumento: string;
   valorTotalBeneficioProv?: number;
   hashDocumento?: string;
 }
 
-
-export enum FaturaClassification {
+export enum FaturaAquisicaoClassification {
   REPARACAO_AUTOMOVEIS = "C01",
   REPARACAO_MOTOCICLOS = "C02",
   RESTAURACAO_ALOJAMENTO = "C03",

@@ -1,4 +1,4 @@
-import { Fatura, FaturaClassification } from "../domain/models.js"
+import { Fatura, FaturaAquisicaoClassification } from "../domain/models.js"
 import { FaturaClassificationResult } from "./models.js"
 
 type FetchFactura = {
@@ -103,7 +103,7 @@ export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatur
       idDocumento: it.idDocumento,
       nifEmitente: it.nifEmitente,
       nomeEmitente: it.nomeEmitente,
-      actividadeEmitente: it.actividadeEmitente as FaturaClassification,
+      actividadeEmitente: it.actividadeEmitente as FaturaAquisicaoClassification,
       dataEmissaoDocumento: it.dataEmissaoDocumento,
       hashDocumento: it.hashDocumento
     })
@@ -122,7 +122,7 @@ export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFat
   return fetch(request).then((response) => response.json())
 }
 
-export const classifyFatura = async (fatura: Fatura, classification: FaturaClassification) : Promise<FaturaClassificationResult> => {
+export const classifyFatura = async (fatura: Fatura, classification: FaturaAquisicaoClassification) : Promise<FaturaClassificationResult> => {
   const result = await fetch("https://faturas.portaldasfinancas.gov.pt/resolverPendenciaAdquirente.action", {
     headers: {
       "content-type": "application/x-www-form-urlencoded",
@@ -154,7 +154,7 @@ export const classifyFatura = async (fatura: Fatura, classification: FaturaClass
   return FaturaClassificationResult.UNKNOWN
 }
 
-const encodeClassificationBody = (fatura: Fatura, classification: FaturaClassification): string => {
+const encodeClassificationBody = (fatura: Fatura, classification: FaturaAquisicaoClassification): string => {
   const body = new URLSearchParams()
 
   body.append('idDocumento', fatura.idDocumento.toString())
@@ -175,7 +175,7 @@ const encodeClassificationBody = (fatura: Fatura, classification: FaturaClassifi
 
 
 
-export const getFaturasByClassification = async (fromDate: Date, toDate: Date, classification: FaturaClassification): Promise<Fatura[]> => {
+export const getFaturasByClassification = async (fromDate: Date, toDate: Date, classification: FaturaAquisicaoClassification): Promise<Fatura[]> => {
   const request = new URL('https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosIRSAdquirente.action')
   request.searchParams.append("dataInicioFilter", fromDate.toISOString().slice(0, 10))
   request.searchParams.append("dataFimFilter", toDate.toISOString().slice(0, 10))
@@ -203,7 +203,7 @@ export const getFaturasByClassification = async (fromDate: Date, toDate: Date, c
     idDocumento: it.idDocumento,
     nifEmitente: it.nifEmitente,
     nomeEmitente: it.nomeEmitente,
-    actividadeEmitente: it.actividadeEmitente as FaturaClassification,
+    actividadeEmitente: it.actividadeEmitente as FaturaAquisicaoClassification,
     dataEmissaoDocumento: it.dataEmissaoDocumento,
     valorTotalBeneficioProv: it.valorTotalBeneficioProv,
     hashDocumento: it.hashDocumento,
