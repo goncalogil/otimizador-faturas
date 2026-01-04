@@ -1,7 +1,7 @@
-import { Fatura, FaturaAquisicaoClassification } from "../domain/models.js"
+import { Fatura, FaturaAquisicaoClassification, FaturaActividadeClassification } from "../domain/models.js"
 import { FaturaClassificationResult } from "./models.js"
 
-type FetchFactura = {
+export type FetchFactura = {
   idDocumento: number,
   origemRegisto: string,
   origemRegistoDesc: string,
@@ -122,13 +122,17 @@ export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFat
   return fetch(request).then((response) => response.json())
 }
 
-export const classifyFatura = async (fatura: Fatura, classification: FaturaAquisicaoClassification) : Promise<FaturaClassificationResult> => {
+export const classifyFatura = async (
+  idDocumento: number,
+  classification: FaturaAquisicaoClassification,
+  activityClassification?: FaturaActividadeClassification,
+) : Promise<FaturaClassificationResult> => {
   const result = await fetch("https://faturas.portaldasfinancas.gov.pt/resolverPendenciaAdquirente.action", {
     headers: {
       "content-type": "application/x-www-form-urlencoded",
     },
     referrerPolicy: "strict-origin-when-cross-origin",
-    body: encodeClassificationBody(fatura, classification),
+    body: encodeClassificationBody(idDocumento, classification, activityClassification),
     method: "POST",
     mode: "cors",
     credentials: "include"
@@ -154,21 +158,18 @@ export const classifyFatura = async (fatura: Fatura, classification: FaturaAquis
   return FaturaClassificationResult.UNKNOWN
 }
 
-const encodeClassificationBody = (fatura: Fatura, classification: FaturaAquisicaoClassification): string => {
+const encodeClassificationBody = (
+  idDocumento: number,
+  classification: FaturaAquisicaoClassification,
+  activityClassification?: FaturaActividadeClassification,
+): string => {
   const body = new URLSearchParams()
-
-  body.append('idDocumento', fatura.idDocumento.toString())
-  // body.append('dataEmissaoDocumento', fatura.dataEmissaoDocumento)
-  //body.append('dataEmissaoDocumentoOriginal', '2024-01-06')
-  // if (fatura.hashDocumento) {
-  //   body.append('hashDocumento', fatura.hashDocumento)
-  // }
-  //body.append('linhasDocumento', '% 5B % 7B % 22valorBaseTributavel % 22 % 3A754 % 2C % 22valorIva % 22 % 3A45 % 2C % 22valorTotal % 22 % 3A799 % 2C % 22regiaoFiscal % 22 % 3Anull % 2C % 22taxaIva % 22 % 3A600 % 2C % 22tipoTaxaIva % 22 % 3A % 22IVA % 22 % 2C % 22motivoIsencao % 22 % 3Anull % 2C % 22motivoIsencaoDesc % 22 % 3A % 22 % 22 % 2C % 22docsOrigem % 22 % 3A % 5B % 5D % 2C % 22idLinha % 22 % 3A137537058350 % 2C % 22paisTaxa % 22 % 3A % 22PT % 22 % 2C % 22paisTaxaDesc % 22 % 3A % 22PORTUGAL % 22 % 2C % 22regiaoTaxa % 22 % 3A % 221 % 22 % 2C % 22regiaoTaxaDesc % 22 % 3A % 22Continente % 22 % 2C % 22taxa % 22 % 3A % 22RED % 22 % 2C % 22taxaDesc % 22 % 3Anull % 2C % 22dataDocumento % 22 % 3A % 222024-01-06 % 22 % 2C % 22origemRegisto % 22 % 3A % 22E % 22 % 2C % 22taxaIvaVerba % 22 % 3A % 22RED % 22 % 2C % 22indicadorDebitoCredito % 22 % 3A % 22C % 22 % 7D % 5D')
+  body.append('idDocumento', idDocumento.toString())
   body.append('ambitoAquisicaoPend', classification)
-  //body.append('ambitoActividadeProfPend',) // Pode ser null
-  //body.append('cancelarAction', 'detalheDocumentoAdquirente.action%3FidDocumento%3D117836199158%26dataEmissaoDocumento%3D2024-01-06')
-  //body.append('mostraRemoverBtn', 'false')
-  //body.append('showAdquirenteEdit', 'true')
+
+  if (activityClassification) {
+    body.append('ambitoActividadeProfPend', activityClassification)
+  }
 
   return body.toString()
 }

@@ -22,3 +22,9 @@ export enum FaturaAquisicaoClassification {
   GINASIOS = "C11",
   OUTROS = "C99"
 }
+
+export enum FaturaActividadeClassification {
+  SIM = "0",
+  NAO = "1",
+  PARCIAL = "2"
+}
