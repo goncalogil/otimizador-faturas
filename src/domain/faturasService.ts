@@ -30,6 +30,11 @@ export const classifyFatura = async (
     return Promise.resolve(FaturaClassificationResult.UNKNOWN);
   }
 
+  if (fatura.actividadeEmitente === classification) {
+    console.log(`Fatura from ${fatura.idDocumento} already classified as ${classification}`)
+    return Promise.resolve(FaturaClassificationResult.VALID);
+  }
+
   if (!idToActividadeClassification) {
     console.log(`Classifying fatura from ${fatura.nifEmitente} as ${classification}`)
     return portalFinancasGateway.classifyFatura(fatura.idDocumento, classification)
