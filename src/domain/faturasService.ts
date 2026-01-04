@@ -35,13 +35,13 @@ export const classifyFatura = async (
     return Promise.resolve(FaturaClassificationResult.VALID);
   }
 
-  if (!idToActividadeClassification) {
-    console.log(`Classifying fatura from ${fatura.nifEmitente} as ${classification}`)
-    return portalFinancasGateway.classifyFatura(fatura.idDocumento, classification)
-  }
+  const actividadeClassification = !!idToActividadeClassification
+    ? idToActividadeClassification[fatura.idDocumento] ?? FaturaActividadeClassification.NAO
+    : undefined;
 
-  const actividadeClassification = idToActividadeClassification[fatura.idDocumento] ?? FaturaActividadeClassification.NAO;
   console.log(`Classifying fatura from ${fatura.nifEmitente} as ${classification} (actividade: ${actividadeClassification})`)
+
+  register[fatura.nifEmitente] = classification
   return portalFinancasGateway.classifyFatura(fatura.idDocumento, classification, actividadeClassification)
 }
 
@@ -76,7 +76,6 @@ export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
 
     const highestClassification = await getHighestClassification(fatura, classificationPriority)
     if(highestClassification) {
-      register[fatura.nifEmitente] = highestClassification
       console.log(`Stored ${highestClassification} classification to NIF: ${fatura.nifEmitente}`)
     }
   }
