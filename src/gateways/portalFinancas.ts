@@ -52,6 +52,58 @@ type FetchFaturasResponse = {
   totalElementos: number
 }
 
+type FetchFaturaDedutivel = {
+  ambito: string,
+  cTipoDocumento: string,
+  dataDocumento: string,
+  fim: string,
+  idDocumento: number,
+  indicadorIncoerenciaFatshare: string,
+  linhas: {
+    baseTributavel: number,
+    codRegiao: string,
+    debitoCredito: string,
+    percentagem: number,
+    tipoTaxa: string,
+    valorDeduzido: number,
+    valorIVA: number,
+    valorTotal: number,
+  }[],
+  nifAdquirente: string,
+  nifEmitente: number,
+  nomeAdquirente: string,
+  nomeEmitente: string,
+  novoAmbito: string,
+  numeroDocumento: string,
+  podeClassificar: number,
+  temLinhasIsentas: boolean,
+  temTotalizadorIncoerente: boolean,
+  tipoDocumento: string,
+  vTotalDeduzido: number,
+  vTotalDeduzidoTaxaIntermedia: number,
+  vTotalDeduzidoTaxaNormal: number,
+  vTotalDeduzidoTaxaReduzida: number,
+  vTotalIVATaxaIntermedia: number,
+  vTotalIVATaxaNormal: number,
+  vTotalIVATaxaReduzida: number,
+  vTotalTributavelIsentoIva: number,
+  vTotalTributavelTaxaIntermedia: number,
+  vTotalTributavelTaxaNormal: number,
+  vTotalTributavelTaxaReduzida: number,
+  valorTotal: number,
+  valorTotalBaseTributavel: number,
+  valorTotalIVA: number,
+  xPercentagem: number,
+}
+
+
+type FetchFaturasDedutiveisResponse = {
+  classificacaoSimplificada: boolean,
+  codResposta: string,
+  faturasDedutivel: FetchFaturaDedutivel[],
+  isWarning : boolean
+}
+
 const yearlyPeriods = (fromDate: Date, toDate: Date): { start: Date; end: Date }[] => {
   if (fromDate > toDate) return [];
 
@@ -209,4 +261,31 @@ export const getFaturasByClassification = async (fromDate: Date, toDate: Date, c
     valorTotalBeneficioProv: it.valorTotalBeneficioProv,
     hashDocumento: it.hashDocumento,
   }))
+}
+
+export const getFaturasDedutiveis = async(fromDate: Date, toDate: Date): Promise<FetchFaturaDedutivel[]> => {
+  const faturas: FetchFaturaDedutivel[] = []
+  const trimesters = ["3T", "6T", "9T", "12T"]
+
+  for (const yearPeriod of yearlyPeriods(fromDate, toDate)) {
+    const year = yearPeriod.start.getFullYear()
+
+    // We're downloading all the trimesters even if the period is partial
+    for (const trimester of trimesters) {
+      const response = await fetchFaturasDedutiveis(year.toString(), trimester)
+      faturas.push(...response.faturasDedutivel)
+    }
+  }
+
+  return faturas.filter((it) => {
+    const faturaDate = new Date(it.dataDocumento)
+    return faturaDate >= fromDate && faturaDate <= toDate
+  })
+}
+
+export const fetchFaturasDedutiveis = async (ano: string, periodo: string): Promise<FetchFaturasDedutiveisResponse> => {
+  const request = new URL('https://iva.portaldasfinancas.gov.pt/dpiva/iva-automatico/api/faturas/dedutivel')
+  request.searchParams.append("Ano", ano)
+  request.searchParams.append("Periodo", periodo)
+  return fetch(request).then((response) => response.json())
 }

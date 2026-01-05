@@ -9,7 +9,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://faturas.portaldasfinancas.gov.pt/*"],
+      "matches": ["*://*.portaldasfinancas.gov.pt/*"],
       "js": ["index.js"]
     }
   ],
@@ -17,7 +17,7 @@
     "default_popup": "popup.html"
   },
   "host_permissions": [
-    "*://faturas.portaldasfinancas.gov.pt/*"
+    "*://*.portaldasfinancas.gov.pt/*"
   ],
   "permissions": [
     "scripting"
