@@ -63,7 +63,7 @@ export const getHighestClassification = async (fatura: Fatura, order: FaturaAqui
 
 
 export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
-  const faturas = await portalFinancasGateway.getAllFaturas(fromDate, toDate)
+  const faturas = await portalFinancasGateway.getFaturas(fromDate, toDate) as Fatura[];
 
   for (const fatura of faturas) {
     console.debug(`Handling fatura ${fatura.idDocumento} - NIF: ${fatura.nifEmitente} - ${fatura.nomeEmitente}`)

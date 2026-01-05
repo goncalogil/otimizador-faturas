@@ -75,7 +75,7 @@ const yearlyPeriods = (fromDate: Date, toDate: Date): { start: Date; end: Date }
   return periods
 }
 
-export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
+export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFactura[]> => {
   const allFaturas: FetchFactura[] = []
 
   for (const yearPeriod of yearlyPeriods(fromDate, toDate)) {
@@ -83,7 +83,7 @@ export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatur
     let shouldRequestNextPage = false
 
     do {
-      const response = await getFaturas(start, end)
+      const response = await fetchFaturas(start, end)
       allFaturas.push(...response.linhas)
       shouldRequestNextPage = response.numElementos < response.totalElementos
 
@@ -114,7 +114,7 @@ export const getAllFaturas = async (fromDate: Date, toDate: Date): Promise<Fatur
   return [...uniqueFaturas.values()]
 }
 
-export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFaturasResponse> => {
+const fetchFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFaturasResponse> => {
   const request = new URL('https://faturas.portaldasfinancas.gov.pt/json/obterDocumentosAdquirente.action')
   request.searchParams.append("dataInicioFilter", fromDate.toISOString().slice(0, 10))
   request.searchParams.append("dataFimFilter", toDate.toISOString().slice(0, 10))
