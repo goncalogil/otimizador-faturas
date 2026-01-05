@@ -1,7 +1,7 @@
 import { Fatura, FaturaAquisicaoClassification, FaturaActividadeClassification } from "../domain/models.js"
 import { FaturaClassificationResult } from "./models.js"
 
-export type FetchFactura = {
+type FetchFactura = {
   idDocumento: number,
   origemRegisto: string,
   origemRegistoDesc: string,
@@ -52,7 +52,7 @@ type FetchFaturasResponse = {
   totalElementos: number
 }
 
-export type FetchFaturaDedutivel = {
+type FetchFaturaDedutivel = {
   ambito: string,
   cTipoDocumento: string,
   dataDocumento: string,
