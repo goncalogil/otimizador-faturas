@@ -1,6 +1,6 @@
 import { FaturaClassificationResult } from "../gateways/models";
 import * as portalFinancasGateway from "../gateways/portalFinancas";
-import { Fatura, FaturaAquisicaoClassification, FaturaActividadeClassification } from "./models"
+import { Fatura, FaturaAquisicaoClassification, FaturaActividadeClassification, FaturaDedutivel } from "./models"
 
 const classificationPriority: FaturaAquisicaoClassification[] = [
   FaturaAquisicaoClassification.EDUCACAO,
@@ -105,7 +105,11 @@ const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
 }
 
 export const backupState = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
-  return portalFinancasGateway.getAllFaturas(fromDate, toDate)
+  return await portalFinancasGateway.getFaturas(fromDate, toDate) as Fatura[];
+}
+
+export const backupIva = async (fromDate: Date, toDate: Date): Promise<FaturaDedutivel[]> => {
+  return await portalFinancasGateway.getFaturasDedutiveis(fromDate, toDate) as FaturaDedutivel[];
 }
 
 export const restoreState = async (faturas: Fatura[]) : Promise<void> => {

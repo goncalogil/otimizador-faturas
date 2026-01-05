@@ -52,7 +52,7 @@ type FetchFaturasResponse = {
   totalElementos: number
 }
 
-type FetchFaturaDedutivel = {
+export type FetchFaturaDedutivel = {
   ambito: string,
   cTipoDocumento: string,
   dataDocumento: string,

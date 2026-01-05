@@ -8,24 +8,14 @@ async function optimizer(): Promise<void> {
   await optimizeFaturas(fromDate, toDate)
 }
 
-async function backup(): Promise<void> {
+async function backupFaturas(): Promise<void> {
   const faturas = await backupState(fromDate, toDate)
+  downloadData(faturas, 'facturas-backup.json')
+}
 
-  const blob = new Blob([JSON.stringify(faturas, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'facturas-backup.json';  // Set the filename for the JSON file
-  a.style.display = 'none';  // Hide the link element
-
-  // Append the link to the document body, click it, and then remove it
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  // Release the object URL after download
-  URL.revokeObjectURL(url);
+async function backupIva(): Promise<void> {
+  const iva = await backupState(fromDate, toDate)
+  downloadData(iva, 'facturas-iva.json')
 }
 
 async function restore(base64File: string) {
@@ -45,6 +35,25 @@ async function restore(base64File: string) {
   await restoreState(faturas)
 }
 
+function downloadData(data: {}, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;  // Set the filename for the JSON file
+  a.style.display = 'none';  // Hide the link element
+
+  // Append the link to the document body, click it, and then remove it
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // Release the object URL after download
+  URL.revokeObjectURL(url);
+}
+
 (window as any).optimizer = optimizer;
-(window as any).backup = backup;
+(window as any).backupFaturas = backupFaturas;
+(window as any).backupIva = backupIva;
 (window as any).restore = restore;
