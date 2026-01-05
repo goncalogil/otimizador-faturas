@@ -14,7 +14,7 @@ async function backupFaturas(): Promise<void> {
 }
 
 async function backupIva(): Promise<void> {
-  const iva = await backupState(fromDate, toDate)
+  const iva = await backup(fromDate, toDate)
   downloadData(iva, 'facturas-iva.json')
 }
 

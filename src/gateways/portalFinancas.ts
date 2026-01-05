@@ -265,7 +265,7 @@ export const getFaturasByClassification = async (fromDate: Date, toDate: Date, c
 
 export const getFaturasDedutiveis = async(fromDate: Date, toDate: Date): Promise<FetchFaturaDedutivel[]> => {
   const faturas: FetchFaturaDedutivel[] = []
-  const trimesters = ["3T", "6T", "9T", "12T"]
+  const trimesters = ["03T", "06T", "09T", "12T"]
 
   for (const yearPeriod of yearlyPeriods(fromDate, toDate)) {
     const year = yearPeriod.start.getFullYear()

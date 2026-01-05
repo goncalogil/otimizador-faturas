@@ -17,6 +17,20 @@ async function runBackup() {
   });
 }
 
+async function runBackupIva() {
+  chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    const url = tabs[0].url;
+    if (!url || !url.includes('iva.portaldasfinancas.gov.pt')) {
+      alert('Please navigate to iva.portaldasfinancas.gov.pt first');
+      return;
+    }
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id!, allFrames: true },
+      func: () => window.backupIva()
+    });
+  });
+}
+
 async function runRestore() {
   const fileInput = document.getElementById('fileInput') as HTMLInputElement;
   const file = fileInput.files?.[0];
@@ -48,3 +62,4 @@ async function runRestore() {
 document.getElementById('runRestoreButton')!.addEventListener('click', runRestore);
 document.getElementById('runScriptButton')!.addEventListener('click', runOptimizer);
 document.getElementById('runBackupButton')!.addEventListener('click', runBackup);
+document.getElementById('runBackupIvaButton')!.addEventListener('click', runBackupIva);
