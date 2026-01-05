@@ -2,6 +2,6 @@ import { FaturaDedutivel } from "./models"
 import * as portalFinancasGateway from "../gateways/portalFinancas";
 
 export const backup = async (fromDate: Date, toDate: Date): Promise<FaturaDedutivel[]> => {
-  return await portalFinancasGateway.getFaturasDedutiveis(fromDate, toDate) as FaturaDedutivel[];
+  return portalFinancasGateway.getFaturasDedutiveis(fromDate, toDate);
 }
 

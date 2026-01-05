@@ -127,7 +127,7 @@ const yearlyPeriods = (fromDate: Date, toDate: Date): { start: Date; end: Date }
   return periods
 }
 
-export const getFaturas = async (fromDate: Date, toDate: Date): Promise<FetchFactura[]> => {
+export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
   const allFaturas: FetchFactura[] = []
 
   for (const yearPeriod of yearlyPeriods(fromDate, toDate)) {

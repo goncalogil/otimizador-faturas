@@ -63,7 +63,7 @@ export const getHighestClassification = async (fatura: Fatura, order: FaturaAqui
 
 
 export const optimizeFaturas = async (fromDate: Date, toDate: Date) => {
-  const faturas = await portalFinancasGateway.getFaturas(fromDate, toDate) as Fatura[];
+  const faturas = await portalFinancasGateway.getFaturas(fromDate, toDate);
 
   for (const fatura of faturas) {
     console.debug(`Handling fatura ${fatura.idDocumento} - NIF: ${fatura.nifEmitente} - ${fatura.nomeEmitente}`)
@@ -105,7 +105,7 @@ const adjustFaturasWithZeroBenefit = async (fromDate: Date, toDate: Date) => {
 }
 
 export const backupState = async (fromDate: Date, toDate: Date): Promise<Fatura[]> => {
-  return await portalFinancasGateway.getFaturas(fromDate, toDate) as Fatura[];
+  return await portalFinancasGateway.getFaturas(fromDate, toDate);
 }
 
 export const restoreState = async (faturas: Fatura[]) : Promise<void> => {
