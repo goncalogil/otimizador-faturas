@@ -1,5 +1,6 @@
 interface Window {
   optimizer: () => Promise<void>;
-  backup: () => Promise<string>;
+  backupFaturas: () => Promise<string>;
+  backupIva: () => Promise<string>;
   restore: (fileName: string) => Promise<string>;
 }
