@@ -1,11 +1,38 @@
 export type Fatura = {
-  actividadeEmitente?: FaturaAquisicaoClassification;
-  valorTotalBeneficioProv?: number;
-  idDocumento: number;
-  nifEmitente: number;
-  nomeEmitente: string;
-  dataEmissaoDocumento: string; // Este podia ser uma Date. Sendo o FecthFactura uma string, a conversão podia ser feita na gateway
-  hashDocumento?: string;
+  idDocumento: number,
+  origemRegisto: string,
+  origemRegistoDesc: string,
+  nifEmitente: number,
+  nomeEmitente: string,
+  nifAdquirente: number,
+  nomeAdquirente?: string,
+  paisAdquirente: string,
+  nifAdquirenteInternac?: number,
+  tipoDocumento: string,
+  tipoDocumentoDesc: string,
+  numerodocumento: string,
+  hashDocumento?: string,
+  dataEmissaoDocumento: string, // Este podia ser uma Date. Sendo o FecthFactura uma string, a conversão podia ser feita na gateway
+  valorTotal: number,
+  valorTotalBaseTributavel: number,
+  valorTotalIva: number,
+  valorTotalBeneficioProv?: number,
+  valorTotalSetorBeneficio?: number,
+  valorTotalDespesasGerais?: number,
+  estadoBeneficio: string,
+  estadoBeneficioDesc: string,
+  estadoBeneficioEmitente: string,
+  estadoBeneficioDescEmitente: string,
+  existeTaxaNormal?: string,
+  actividadeEmitente?: FaturaAquisicaoClassification,
+  actividadeEmitenteDesc?: string,
+  actividadeProf?: string,
+  actividadeProfDesc?: string,
+  comunicacaoComerciante: boolean,
+  comunicacaoConsumidor: boolean,
+  isDocumentoEstrangeiro: boolean,
+  atcud: string,
+  autofaturacao: boolean
 };
 
 export enum FaturaAquisicaoClassification {
@@ -24,9 +51,9 @@ export enum FaturaAquisicaoClassification {
 }
 
 export enum FaturaActividadeClassification {
-  SIM = "0",
-  NAO = "1",
-  PARCIAL = "2",
+  SIM = "0", // Actividade
+  NAO = "1", // Pessoal
+  PARCIAL = "2" // Parcial
 }
 
 export type FaturaDedutivel = {

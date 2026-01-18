@@ -1,42 +1,7 @@
 import { Fatura, FaturaAquisicaoClassification, FaturaActividadeClassification } from "../domain/models.js"
 import { FaturaClassificationResult } from "./models.js"
 
-type FetchFactura = {
-  idDocumento: number,
-  origemRegisto: string,
-  origemRegistoDesc: string,
-  nifEmitente: number,
-  nomeEmitente: string,
-  nifAdquirente: number,
-  nomeAdquirente?: string,
-  paisAdquirente: string,
-  nifAdquirenteInternac?: number,
-  tipoDocumento: string,
-  tipoDocumentoDesc: string,
-  numerodocumento: string,
-  hashDocumento?: string,
-  dataEmissaoDocumento: string,
-  valorTotal: number,
-  valorTotalBaseTributavel: number,
-  valorTotalIva: number,
-  valorTotalBeneficioProv?: number,
-  valorTotalSetorBeneficio?: number,
-  valorTotalDespesasGerais?: number,
-  estadoBeneficio: string,
-  estadoBeneficioDesc: string,
-  estadoBeneficioEmitente: string,
-  estadoBeneficioDescEmitente: string,
-  existeTaxaNormal?: string,
-  actividadeEmitente?: string,
-  actividadeEmitenteDesc?: string,
-  actividadeProf?: string,
-  actividadeProfDesc?: string,
-  comunicacaoComerciante: boolean,
-  comunicacaoConsumidor: boolean,
-  isDocumentoEstrangeiro: boolean,
-  atcud: string,
-  autofaturacao: boolean
-}
+type FetchFactura = Fatura
 
 type FetchFaturasResponse = {
   success: boolean,
@@ -151,15 +116,7 @@ export const getFaturas = async (fromDate: Date, toDate: Date): Promise<Fatura[]
 
   const uniqueFaturas = allFaturas.reduce((acc, it) => {
     // Remove duplicates and map
-    acc.set(it.idDocumento, {
-      idDocumento: it.idDocumento,
-      nifEmitente: it.nifEmitente,
-      nomeEmitente: it.nomeEmitente,
-      actividadeEmitente: it.actividadeEmitente as FaturaAquisicaoClassification,
-      dataEmissaoDocumento: it.dataEmissaoDocumento,
-      hashDocumento: it.hashDocumento
-    })
-
+    acc.set(it.idDocumento, it)
     return acc
   }, new Map<number, Fatura>())
 
