@@ -1,8 +1,10 @@
-import { backupState, optimizeFaturas, restoreState } from "./domain/faturasService"
+import { backupState, optimizeFaturas, restoreState } from "./domain/faturasService";
+import { backup } from "./domain/ivaService";
 import { Fatura } from "./domain/models"
+import * as portalFinancas from "./gateways/portalFinancas";
 
-const fromDate = new Date('2024-01-01')
-const toDate = new Date('2024-12-31')
+const fromDate = new Date('2025-01-01')
+const toDate = new Date('2025-12-31')
 
 async function optimizer(): Promise<void> {
   await optimizeFaturas(fromDate, toDate)
@@ -57,3 +59,6 @@ function downloadData(data: {}, filename: string) {
 (window as any).backupFaturas = backupFaturas;
 (window as any).backupIva = backupIva;
 (window as any).restore = restore;
+
+// debug
+(window as any).portalFinancas = portalFinancas;
