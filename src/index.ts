@@ -1,8 +1,8 @@
 import { backupState, optimizeFaturas, restoreState } from "./domain/faturasService"
 import { Fatura } from "./domain/models"
 
-const fromDate = new Date('2024-01-01')
-const toDate = new Date('2024-12-31')
+const fromDate = new Date('2025-01-01')
+const toDate = new Date('2025-12-31')
 
 async function optimizer(): Promise<void> {
   await optimizeFaturas(fromDate, toDate)
